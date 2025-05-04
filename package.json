@@ -18,9 +18,6 @@
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["backpack.tf", "api", "typescript", "steam", "trading"],
-  "author": "Your Name <your.email@example.com>",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yourusername/ts-bptf-api.git"
