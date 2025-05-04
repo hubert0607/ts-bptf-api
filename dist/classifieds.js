@@ -12,7 +12,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ClassifiedsClient = void 0;
 const axios_1 = __importDefault(require("axios"));
 const bottleneck_1 = __importDefault(require("bottleneck"));
 const BATCH_LIMITER = new bottleneck_1.default({
@@ -24,8 +23,8 @@ const STANDARD_LIMITER = new bottleneck_1.default({
     minTime: 1000 // 60 requests/minute
 });
 class ClassifiedsClient {
-    constructor(token) {
-        this.token = token;
+    constructor() {
+        this.token = process.env.BP_TOKEN;
     }
     getSnapshot(sku) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -69,13 +68,13 @@ class ClassifiedsClient {
         });
     }
 }
-exports.ClassifiedsClient = ClassifiedsClient;
+exports.default = ClassifiedsClient;
 function test() {
     return __awaiter(this, void 0, void 0, function* () {
-        const client = new ClassifiedsClient(process.env.BP_TOKEN);
-        // // Get snapshot
-        // const snapshot = await client.getSnapshot('Burning Flames Team Captain');
-        // console.log(snapshot)
+        const client = new ClassifiedsClient();
+        // Get snapshot
+        const snapshot = yield client.getSnapshot('Burning Flames Team Captain');
+        console.log(snapshot);
         // const newListing: BatchListing = {
         //     intent: 1,
         //     currencies: { metal: 2, keys: 2 },
@@ -87,3 +86,4 @@ function test() {
         //   const batchResult = await client.createBatchListings([newListing]);
     });
 }
+test();

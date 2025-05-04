@@ -19,8 +19,8 @@ const STANDARD_LIMITER = new Bottleneck({
 export default class ClassifiedsClient {
   private readonly token: string;
 
-  constructor(token: string) {
-    this.token = token;
+  constructor() {
+    this.token = process.env.BP_TOKEN!;
   }
 
   async getSnapshot(sku: string): Promise<SnapshotResponse> {
@@ -74,9 +74,9 @@ export default class ClassifiedsClient {
 
 
 async function test() {
-    const client = new ClassifiedsClient(process.env.BP_TOKEN!);
+    const client = new ClassifiedsClient();
     
-    // // Get snapshot
+    // Get snapshot
     // const snapshot = await client.getSnapshot('Burning Flames Team Captain');
     // console.log(snapshot)
 
