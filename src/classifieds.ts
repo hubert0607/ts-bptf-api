@@ -16,7 +16,7 @@ const STANDARD_LIMITER = new Bottleneck({
   minTime: 1000 // 60 requests/minute
 });
 
-export class ClassifiedsClient {
+export default class ClassifiedsClient {
   private readonly token: string;
 
   constructor(token: string) {
