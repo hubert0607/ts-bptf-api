@@ -1,14 +1,30 @@
 {
   "name": "ts-bptf-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "TypeScript client for Backpack.tf API.",
+  "main": "dist/classifieds.js",
+  "types": "dist/classifieds.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/classifieds.js",
+      "require": "./dist/classifieds.js",
+      "types": "./dist/classifieds.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["backpack.tf", "api", "typescript", "steam", "trading"],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/ts-bptf-api.git"
+  },
   "type": "commonjs",
   "devDependencies": {
     "@types/node": "^22.15.3",
