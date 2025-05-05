@@ -9,6 +9,11 @@
       "import": "./dist/classifieds.js",
       "require": "./dist/classifieds.js",
       "types": "./dist/classifieds.d.ts"
+    },
+    "./interfaces": {
+      "import": "./dist/interfaces.js",
+      "require": "./dist/interfaces.js",
+      "types": "./dist/interfaces.d.ts"
     }
   },
   "files": [

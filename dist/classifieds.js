@@ -73,8 +73,8 @@ function test() {
     return __awaiter(this, void 0, void 0, function* () {
         const client = new ClassifiedsClient();
         // Get snapshot
-        const snapshot = yield client.getSnapshot('Burning Flames Team Captain');
-        console.log(snapshot);
+        // const snapshot = await client.getSnapshot('Burning Flames Team Captain');
+        // console.log(snapshot)
         // const newListing: BatchListing = {
         //     intent: 1,
         //     currencies: { metal: 2, keys: 2 },
@@ -86,4 +86,3 @@ function test() {
         //   const batchResult = await client.createBatchListings([newListing]);
     });
 }
-test();
