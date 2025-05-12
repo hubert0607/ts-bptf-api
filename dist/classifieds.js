@@ -12,15 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.BatchClient = exports.ClassifiedsClient = void 0;
 const axios_1 = __importDefault(require("axios"));
 const bottleneck_1 = __importDefault(require("bottleneck"));
-const BATCH_LIMITER = new bottleneck_1.default({
-    maxConcurrent: 1,
-    minTime: 6000 // 10 requests/minute
-});
 const STANDARD_LIMITER = new bottleneck_1.default({
     maxConcurrent: 1,
     minTime: 1000 // 60 requests/minute
+});
+const BATCH_LIMITER = new bottleneck_1.default({
+    maxConcurrent: 1,
+    minTime: 6000 // 10 requests/minute
 });
 class ClassifiedsClient {
     constructor() {
@@ -48,17 +49,6 @@ class ClassifiedsClient {
             }));
         });
     }
-    createBatchListings(listings) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return BATCH_LIMITER.schedule(() => __awaiter(this, void 0, void 0, function* () {
-                const response = yield axios_1.default.post('https://backpack.tf/api/classifieds/list/v1', {
-                    token: this.token,
-                    listings
-                });
-                return response.data;
-            }));
-        });
-    }
     deleteListing(listingId) {
         return __awaiter(this, void 0, void 0, function* () {
             return STANDARD_LIMITER.schedule(() => __awaiter(this, void 0, void 0, function* () {
@@ -68,21 +58,55 @@ class ClassifiedsClient {
         });
     }
 }
-exports.default = ClassifiedsClient;
-function test() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const client = new ClassifiedsClient();
-        // Get snapshot
-        // const snapshot = await client.getSnapshot('Burning Flames Team Captain');
-        // console.log(snapshot)
-        // const newListing: BatchListing = {
-        //     intent: 1,
-        //     currencies: { metal: 2, keys: 2 },
-        //     item: {
-        //       quality: "Strange",
-        //       item_name: "Professional Killstreak Minigun",
-        //     }
-        //   };
-        //   const batchResult = await client.createBatchListings([newListing]);
-    });
+exports.ClassifiedsClient = ClassifiedsClient;
+class BatchClient {
+    constructor() {
+        this.listings = [];
+        this.timer = null;
+        this.token = process.env.BP_TOKEN;
+        this.startAutoSend();
+    }
+    startAutoSend() {
+        this.timer = setInterval(() => __awaiter(this, void 0, void 0, function* () {
+            if (this.listings.length > 0) {
+                yield this.sendBatch();
+            }
+        }), 5 * 60 * 1000); // 5 minut
+    }
+    addListing(listing) {
+        this.listings.push(listing);
+        this.checkBatchSize();
+    }
+    checkBatchSize() {
+        if (this.listings.length >= 100) {
+            this.sendBatch();
+        }
+    }
+    flush() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.listings.length === 0)
+                return;
+            yield this.sendBatch();
+        });
+    }
+    sendBatch() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const batchToSend = [...this.listings];
+            this.listings = [];
+            try {
+                yield BATCH_LIMITER.schedule(() => __awaiter(this, void 0, void 0, function* () {
+                    yield axios_1.default.post('https://backpack.tf/api/classifieds/list/v1', {
+                        token: this.token,
+                        listings: batchToSend
+                    });
+                }));
+            }
+            catch (error) {
+                this.listings.unshift(...batchToSend);
+                console.error('Batch send failed:', error);
+                throw error;
+            }
+        });
+    }
 }
+exports.BatchClient = BatchClient;
