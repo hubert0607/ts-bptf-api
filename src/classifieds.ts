@@ -65,17 +65,17 @@ export class BatchClient {
   private listings: BatchListing[] = [];
   private timer: NodeJS.Timeout | null = null;
 
-  constructor() {
+  constructor(autoSendTimeInterval: number = 5*60*1000) {
     this.token = process.env.BP_TOKEN!;
-    this.startAutoSend();
+    this.startAutoSend(autoSendTimeInterval);
   }
 
-  private startAutoSend() {
+  private startAutoSend(autoSendTimeInterval: number) {
     this.timer = setInterval(async () => {
       if (this.listings.length > 0) {
         await this.sendBatch();
       }
-    }, 5*60*1000); // 5 minut
+    }, autoSendTimeInterval); // 5 minut
   }
 
   public addListing(listing: BatchListing): void {

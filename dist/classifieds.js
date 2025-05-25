@@ -60,18 +60,18 @@ class ClassifiedsClient {
 }
 exports.ClassifiedsClient = ClassifiedsClient;
 class BatchClient {
-    constructor() {
+    constructor(autoSendTimeInterval = 5 * 60 * 1000) {
         this.listings = [];
         this.timer = null;
         this.token = process.env.BP_TOKEN;
-        this.startAutoSend();
+        this.startAutoSend(autoSendTimeInterval);
     }
-    startAutoSend() {
+    startAutoSend(autoSendTimeInterval) {
         this.timer = setInterval(() => __awaiter(this, void 0, void 0, function* () {
             if (this.listings.length > 0) {
                 yield this.sendBatch();
             }
-        }), 5 * 60 * 1000); // 5 minut
+        }), autoSendTimeInterval); // 5 minut
     }
     addListing(listing) {
         this.listings.push(listing);

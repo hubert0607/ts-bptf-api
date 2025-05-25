@@ -10,7 +10,7 @@ export declare class BatchClient {
     private readonly token;
     private listings;
     private timer;
-    constructor();
+    constructor(autoSendTimeInterval?: number);
     private startAutoSend;
     addListing(listing: BatchListing): void;
     private checkBatchSize;
