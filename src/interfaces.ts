@@ -73,6 +73,8 @@ export interface Attribute {
     item_name: string;
     craftable?: number;
     priceindex?: number;
+    elevated_quality?: string;
+    particle_name?: string;
   }
   
   export interface BatchListing {
