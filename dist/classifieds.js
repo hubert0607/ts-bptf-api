@@ -66,6 +66,39 @@ class BatchClient {
         this.token = process.env.BP_TOKEN;
         this.startAutoSend(autoSendTimeInterval);
     }
+    processItem(item) {
+        const processed = Object.assign({}, item);
+        let itemName = item.item_name;
+        // Remove quality from item name
+        if (typeof item.quality === 'string') {
+            itemName = itemName.replace(item.quality + ' ', '');
+        }
+        // Handle elevated quality
+        if (item.elevated_quality) {
+            itemName = itemName.replace(item.elevated_quality + ' ', '');
+            processed.quality = `${item.elevated_quality} ${item.quality}`;
+        }
+        // Handle particle effects
+        if (item.particle_name) {
+            itemName = itemName.replace(item.particle_name + ' ', '');
+        }
+        // Validate particle effects
+        if (item.priceindex && item.priceindex !== 0 && !item.particle_name) {
+            throw new Error('You forgot to set up particle_name');
+        }
+        if ((!item.priceindex || item.priceindex === 0) && item.particle_name) {
+            throw new Error('You forgot to set up priceindex (id of particle name)');
+        }
+        // Handle non-craftable items
+        if (item.craftable === 0) {
+            itemName = itemName.replace('Non-Craftable ', '');
+        }
+        processed.item_name = itemName;
+        // Remove processing fields from output
+        delete processed.elevated_quality;
+        delete processed.particle_name;
+        return processed;
+    }
     startAutoSend(autoSendTimeInterval) {
         this.timer = setInterval(() => __awaiter(this, void 0, void 0, function* () {
             if (this.listings.length > 0) {
@@ -74,7 +107,8 @@ class BatchClient {
         }), autoSendTimeInterval); // 5 minut
     }
     addListing(listing) {
-        this.listings.push(listing);
+        const processedListing = Object.assign(Object.assign({}, listing), { item: this.processItem(listing.item) });
+        this.listings.push(processedListing);
         this.checkBatchSize();
     }
     checkBatchSize() {

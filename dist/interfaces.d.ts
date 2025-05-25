@@ -54,6 +54,8 @@ export interface BatchItem {
     item_name: string;
     craftable?: number;
     priceindex?: number;
+    elevated_quality?: string;
+    particle_name?: string;
 }
 export interface BatchListing {
     intent: 0 | 1;

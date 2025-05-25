@@ -11,6 +11,7 @@ export declare class BatchClient {
     private listings;
     private timer;
     constructor(autoSendTimeInterval?: number);
+    private processItem;
     private startAutoSend;
     addListing(listing: BatchListing): void;
     private checkBatchSize;
