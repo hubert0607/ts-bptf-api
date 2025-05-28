@@ -1,4 +1,4 @@
-import { SnapshotResponse, listingPatchRequest, ListingBatchCreateResult, ItemV2, ListingCurrencies } from './interfaces';
+import { SnapshotResponse, listingPatchRequest, ItemV2, ListingCurrencies } from './interfaces';
 export declare class ClassifiedsClient {
     private readonly token;
     constructor();
@@ -18,7 +18,7 @@ export declare class BatchClientV2 {
     addBuyListing(item: ItemV2, currencies: ListingCurrencies, details?: string): void;
     addSellListing(itemId: number, currencies: ListingCurrencies, details?: string): void;
     private checkBatchSize;
-    flush(): Promise<ListingBatchCreateResult[]>;
+    flush(): Promise<any>;
     private sendBatch;
 }
 //# sourceMappingURL=classifieds.d.ts.map

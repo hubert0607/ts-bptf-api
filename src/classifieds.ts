@@ -4,7 +4,6 @@ import {
   SnapshotResponse,
   listingPatchRequest,
   ListingResolvable,
-  ListingBatchCreateResult,
   ItemV2,
   ListingCurrencies
 } from './interfaces';
@@ -144,13 +143,13 @@ export class BatchClientV2 {
     }
   }
 
-  public async flush(): Promise<ListingBatchCreateResult[]> {
+  public async flush(): Promise<any> {
     if (this.listings.length === 0) return [];
     const result = await this.sendBatch();
     return result;
   }
 
-  private async sendBatch(): Promise<ListingBatchCreateResult[]> {
+  private async sendBatch(): Promise<any> {
     const batchToSend = [...this.listings];
     this.listings = [];
 

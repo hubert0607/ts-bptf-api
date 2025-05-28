@@ -105,7 +105,7 @@ export interface ListingResolvable {
   currencies: ListingCurrencies;
 }
 
-export interface ListingBatchCreateResult {
-  result?: any; // This would be the actual listing object
-  error?: any; // This would be the error object
-}
+// export interface ListingBatchCreateResult {
+//   result?: any; // This would be the actual listing object
+//   error?: any; // This would be the error object
+// }

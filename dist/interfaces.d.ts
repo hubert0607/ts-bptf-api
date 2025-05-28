@@ -81,8 +81,4 @@ export interface ListingResolvable {
     details?: string;
     currencies: ListingCurrencies;
 }
-export interface ListingBatchCreateResult {
-    result?: any;
-    error?: any;
-}
 //# sourceMappingURL=interfaces.d.ts.map
