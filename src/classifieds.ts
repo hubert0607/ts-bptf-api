@@ -2,9 +2,11 @@ import axios from "axios";
 import Bottleneck from 'bottleneck';
 import {
   SnapshotResponse,
-  UpdateListingV2,
-  BatchListing,
-  BatchItem
+  listingPatchRequest,
+  ListingResolvable,
+  ListingBatchCreateResult,
+  ItemV2,
+  ListingCurrencies
 } from './interfaces';
 
 const STANDARD_LIMITER = new Bottleneck({
@@ -14,7 +16,7 @@ const STANDARD_LIMITER = new Bottleneck({
 
 const BATCH_LIMITER = new Bottleneck({
   maxConcurrent: 1,
-  minTime: 7000 // 8.5 requests/minute
+  minTime: 6000 // 10 requests/minute
 });
 
 
@@ -40,7 +42,7 @@ export class ClassifiedsClient {
     });
   }
 
-  async updateListing(listingId: string, update: UpdateListingV2): Promise<any> {
+  async updateListing(listingId: string, update: listingPatchRequest): Promise<any> {
     return STANDARD_LIMITER.schedule(async () => {
       const response = await axios.patch(
         `https://backpack.tf/api/v2/classifieds/listings/${listingId}`,
@@ -83,9 +85,9 @@ export class ClassifiedsClient {
 
 
 
-export class BatchClient {
+export class BatchClientV2 {
   private readonly token: string;
-  private listings: BatchListing[] = [];
+  private listings: ListingResolvable[] = [];
   private timer: NodeJS.Timeout | null = null;
 
   constructor(autoSendTimeInterval: number = 5*60*1000) {
@@ -93,57 +95,47 @@ export class BatchClient {
     this.startAutoSend(autoSendTimeInterval);
   }
 
-  private processItem(item: BatchItem): BatchItem {
-    const processed = { ...item };
-    let itemName = item.item_name;
-
-    if (typeof item.quality === 'string') {
-      itemName = itemName.replace(item.quality + ' ', '');
-    }
-
-    if (item.elevated_quality) {
-      itemName = itemName.replace(item.elevated_quality + ' ', '');
-      processed.quality = `${item.elevated_quality} ${item.quality}`;
-    }
-
-    if (item.particle_name) {
-      itemName = itemName.replace(item.particle_name + ' ', '');
-    }
-
-    if (item.priceindex && item.priceindex !== 0 && !item.particle_name) {
-      throw new Error('You forgot to set up particle_name');
-    }
-    if ((!item.priceindex || item.priceindex === 0) && item.particle_name) {
-      throw new Error('You forgot to set up priceindex (id of particle name)');
-    }
-
-    if (item.craftable === 0) {
-      itemName = itemName.replace('Non-Craftable ', '');
-    }
-
-    processed.item_name = itemName;
-    
-    delete processed.elevated_quality;
-    delete processed.particle_name;
-
-    return processed;
-  }
-
   private startAutoSend(autoSendTimeInterval: number) {
     this.timer = setInterval(async () => {
       if (this.listings.length > 0) {
         await this.sendBatch();
       }
-    }, autoSendTimeInterval); // 5 minut
+    }, autoSendTimeInterval);
   }
 
-  public addListing(listing: BatchListing): void {
-    const processedListing = {
-      ...listing,
-      item: this.processItem(listing.item)
-    };
-    this.listings.push(processedListing);
+  private addListing(listing: ListingResolvable): void {
+    this.listings.push(listing);
     this.checkBatchSize();
+  }
+
+  public addBuyListing(
+    item: ItemV2, 
+    currencies: ListingCurrencies, 
+    details?: string
+  ): void {
+    const listing: ListingResolvable = {
+      item: item,
+      currencies: currencies,
+      offers: 1,
+      buyout: 1,
+      details: details
+    };
+    this.addListing(listing);
+  }
+
+  public addSellListing(
+    itemId: number, 
+    currencies: ListingCurrencies, 
+    details?: string
+  ): void {
+    const listing: ListingResolvable = {
+      id: itemId,
+      offers: 1,
+      buyout: 1,
+      currencies: currencies,
+      details: details
+    };
+    this.addListing(listing);
   }
 
   private checkBatchSize(): void {
@@ -152,25 +144,26 @@ export class BatchClient {
     }
   }
 
-  public async flush(): Promise<void> {
-    if (this.listings.length === 0) return;
-    await this.sendBatch();
+  public async flush(): Promise<ListingBatchCreateResult[]> {
+    if (this.listings.length === 0) return [];
+    const result = await this.sendBatch();
+    return result;
   }
 
-  private async sendBatch(): Promise<void> {
+  private async sendBatch(): Promise<ListingBatchCreateResult[]> {
     const batchToSend = [...this.listings];
     this.listings = [];
 
     try {
-      await BATCH_LIMITER.schedule(async () => {
-        await axios.post(
-          'https://backpack.tf/api/classifieds/list/v1',
-          {
-            token: this.token,
-            listings: batchToSend
-          }
+      const result = await BATCH_LIMITER.schedule(async () => {
+        const response = await axios.post(
+          'https://backpack.tf/api/v2/classifieds/listings/batch',
+          batchToSend,
+          { params: { token: this.token } }
         );
+        return response.data;
       });
+      return result;
     } catch (error) {
       this.listings.unshift(...batchToSend);
       console.error('Batch send failed:', error);
@@ -179,14 +172,35 @@ export class BatchClient {
   }
 }
 
+// if (require.main === module) {
+//   const batchClient = new BatchClientV2();
 
-// Check if this file is being run directly
-if (require.main === module) {
-    const classifiedsClient = new ClassifiedsClient();
-    // classifiedsClient.publishAll()
-    classifiedsClient.archiveAll()
+//   let itemNew: ItemV2 = {
+//     baseName: 'Rocket Launcher',
+//     quality: { id: 11 },
+//     killstreakTier: 3,
+//     tradable: true,
+//     craftable: true,
+//     australium: true,
+//     festivized: true,
+//     sheen: { id: 1, name: 'Team Shine' },
+//     spells: [
+//         {
+//           // id: 'weapon-SPELL: Halloween death ghosts',
+//           spellId: 'SPELL: Halloween death ghosts',
+//           // name: 'Exorcism',
+//           type: 'weapon'
+//         },
+//         {
+//         //   id: 'weapon-SPELL: Halloween pumpkin explosions',
+//           spellId: 'SPELL: Halloween pumpkin explosions',
+//         //   name: 'Pumpkin Bombs',
+//           type: 'weapon'
+//         }
+//       ],
+//   }
 
-}
-
-
-
+//   batchClient.addBuyListing(itemNew, {metal:0.11, keys:1}, 'hello world')
+//   batchClient.flush()
+//   // console.log('done')
+// }
