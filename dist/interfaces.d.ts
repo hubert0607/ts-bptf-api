@@ -36,34 +36,53 @@ export interface SnapshotResponse {
     sku?: string;
     created_at?: number;
 }
-export interface UpdateCurrencies {
+export interface ListingCurrencies {
     metal?: number;
     keys?: number;
 }
-export interface UpdateListingV2 {
-    currencies: UpdateCurrencies;
+export interface listingPatchRequest {
+    currencies: ListingCurrencies;
     details?: string;
     quantity?: number;
 }
-export interface BatchCurrencies {
-    metal: number;
-    keys: number;
+export interface EntityV2 {
+    id: number;
+    name?: string;
+    color?: string;
 }
-export interface BatchItem {
-    quality: string;
-    item_name: string;
-    craftable?: number;
-    priceindex?: number;
-    elevated_quality?: string;
-    particle_name?: string;
+export interface ItemV2 {
+    baseName: string;
+    quantity?: number;
+    quality?: EntityV2;
+    rarity?: EntityV2;
+    paint?: EntityV2;
+    particle?: EntityV2;
+    elevatedQuality?: EntityV2;
+    tradable: boolean;
+    craftable: boolean;
+    killstreakTier?: number;
+    sheen?: EntityV2;
+    killstreaker?: EntityV2;
+    festivized?: boolean;
+    australium?: boolean;
+    spells?: Spell[];
 }
-export interface BatchListing {
-    intent: 0 | 1;
+export interface Spell {
+    id?: string;
+    spellId: string;
+    name?: string;
+    type: string;
+}
+export interface ListingResolvable {
+    id?: number;
+    item?: ItemV2;
+    offers: number;
+    buyout: number;
     details?: string;
-    currencies: BatchCurrencies;
-    item: BatchItem;
-    offers?: number;
-    buyout?: number;
-    promoted?: number;
+    currencies: ListingCurrencies;
+}
+export interface ListingBatchCreateResult {
+    result?: any;
+    error?: any;
 }
 //# sourceMappingURL=interfaces.d.ts.map

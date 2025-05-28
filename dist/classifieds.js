@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BatchClient = exports.ClassifiedsClient = void 0;
+exports.BatchClientV2 = exports.ClassifiedsClient = void 0;
 const axios_1 = __importDefault(require("axios"));
 const bottleneck_1 = __importDefault(require("bottleneck"));
 const STANDARD_LIMITER = new bottleneck_1.default({
@@ -21,7 +21,7 @@ const STANDARD_LIMITER = new bottleneck_1.default({
 });
 const BATCH_LIMITER = new bottleneck_1.default({
     maxConcurrent: 1,
-    minTime: 7000 // 8.5 requests/minute
+    minTime: 6000 // 10 requests/minute
 });
 class ClassifiedsClient {
     constructor() {
@@ -57,53 +57,57 @@ class ClassifiedsClient {
             }));
         });
     }
+    publishAll() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield axios_1.default.post(`https://backpack.tf/api/v2/classifieds/listings/publishAll`, null, { params: { token: this.token } });
+            return response.data;
+        });
+    }
+    archiveAll() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield axios_1.default.post(`https://backpack.tf/api/v2/classifieds/listings/archiveAll`, null, { params: { token: this.token } });
+            return response.data;
+        });
+    }
 }
 exports.ClassifiedsClient = ClassifiedsClient;
-class BatchClient {
+class BatchClientV2 {
     constructor(autoSendTimeInterval = 5 * 60 * 1000) {
         this.listings = [];
         this.timer = null;
         this.token = process.env.BP_TOKEN;
         this.startAutoSend(autoSendTimeInterval);
     }
-    processItem(item) {
-        const processed = Object.assign({}, item);
-        let itemName = item.item_name;
-        if (typeof item.quality === 'string') {
-            itemName = itemName.replace(item.quality + ' ', '');
-        }
-        if (item.elevated_quality) {
-            itemName = itemName.replace(item.elevated_quality + ' ', '');
-            processed.quality = `${item.elevated_quality} ${item.quality}`;
-        }
-        if (item.particle_name) {
-            itemName = itemName.replace(item.particle_name + ' ', '');
-        }
-        if (item.priceindex && item.priceindex !== 0 && !item.particle_name) {
-            throw new Error('You forgot to set up particle_name');
-        }
-        if ((!item.priceindex || item.priceindex === 0) && item.particle_name) {
-            throw new Error('You forgot to set up priceindex (id of particle name)');
-        }
-        if (item.craftable === 0) {
-            itemName = itemName.replace('Non-Craftable ', '');
-        }
-        processed.item_name = itemName;
-        delete processed.elevated_quality;
-        delete processed.particle_name;
-        return processed;
-    }
     startAutoSend(autoSendTimeInterval) {
         this.timer = setInterval(() => __awaiter(this, void 0, void 0, function* () {
             if (this.listings.length > 0) {
                 yield this.sendBatch();
             }
-        }), autoSendTimeInterval); // 5 minut
+        }), autoSendTimeInterval);
     }
     addListing(listing) {
-        const processedListing = Object.assign(Object.assign({}, listing), { item: this.processItem(listing.item) });
-        this.listings.push(processedListing);
+        this.listings.push(listing);
         this.checkBatchSize();
+    }
+    addBuyListing(item, currencies, details) {
+        const listing = {
+            item: item,
+            currencies: currencies,
+            offers: 1,
+            buyout: 1,
+            details: details
+        };
+        this.addListing(listing);
+    }
+    addSellListing(itemId, currencies, details) {
+        const listing = {
+            id: itemId,
+            offers: 1,
+            buyout: 1,
+            currencies: currencies,
+            details: details
+        };
+        this.addListing(listing);
     }
     checkBatchSize() {
         if (this.listings.length >= 100) {
@@ -113,8 +117,9 @@ class BatchClient {
     flush() {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.listings.length === 0)
-                return;
-            yield this.sendBatch();
+                return [];
+            const result = yield this.sendBatch();
+            return result;
         });
     }
     sendBatch() {
@@ -122,12 +127,11 @@ class BatchClient {
             const batchToSend = [...this.listings];
             this.listings = [];
             try {
-                yield BATCH_LIMITER.schedule(() => __awaiter(this, void 0, void 0, function* () {
-                    yield axios_1.default.post('https://backpack.tf/api/classifieds/list/v1', {
-                        token: this.token,
-                        listings: batchToSend
-                    });
+                const result = yield BATCH_LIMITER.schedule(() => __awaiter(this, void 0, void 0, function* () {
+                    const response = yield axios_1.default.post('https://backpack.tf/api/v2/classifieds/listings/batch', batchToSend, { params: { token: this.token } });
+                    return response.data;
                 }));
+                return result;
             }
             catch (error) {
                 this.listings.unshift(...batchToSend);
@@ -137,4 +141,34 @@ class BatchClient {
         });
     }
 }
-exports.BatchClient = BatchClient;
+exports.BatchClientV2 = BatchClientV2;
+// if (require.main === module) {
+//   const batchClient = new BatchClientV2();
+//   let itemNew: ItemV2 = {
+//     baseName: 'Rocket Launcher',
+//     quality: { id: 11 },
+//     killstreakTier: 3,
+//     tradable: true,
+//     craftable: true,
+//     australium: true,
+//     festivized: true,
+//     sheen: { id: 1, name: 'Team Shine' },
+//     spells: [
+//         {
+//           // id: 'weapon-SPELL: Halloween death ghosts',
+//           spellId: 'SPELL: Halloween death ghosts',
+//           // name: 'Exorcism',
+//           type: 'weapon'
+//         },
+//         {
+//         //   id: 'weapon-SPELL: Halloween pumpkin explosions',
+//           spellId: 'SPELL: Halloween pumpkin explosions',
+//         //   name: 'Pumpkin Bombs',
+//           type: 'weapon'
+//         }
+//       ],
+//   }
+//   batchClient.addBuyListing(itemNew, {metal:0.11, keys:1}, 'hello world')
+//   batchClient.flush()
+//   // console.log('done')
+// }
