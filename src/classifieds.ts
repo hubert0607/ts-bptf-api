@@ -13,6 +13,11 @@ const STANDARD_LIMITER = new Bottleneck({
   minTime: 10000 // 10 requests/minute
 });
 
+const UPDATE_LIMITER = new Bottleneck({
+  maxConcurrent: 1,
+  minTime: 1000 // 60 requests/minute
+});
+
 const BATCH_LIMITER = new Bottleneck({
   maxConcurrent: 1,
   minTime: 6000 // 10 requests/minute
@@ -42,7 +47,7 @@ export class ClassifiedsClient {
   }
 
   async updateListing(listingId: string, update: listingPatchRequest): Promise<any> {
-    return STANDARD_LIMITER.schedule(async () => {
+    return UPDATE_LIMITER.schedule(async () => {
       const response = await axios.patch(
         `https://backpack.tf/api/v2/classifieds/listings/${listingId}`,
         update,
@@ -53,7 +58,7 @@ export class ClassifiedsClient {
   }
 
   async deleteListing(listingId: string): Promise<any> {
-    return STANDARD_LIMITER.schedule(async () => {
+    return UPDATE_LIMITER.schedule(async () => {
       const response = await axios.delete(
         `https://backpack.tf/api/v2/classifieds/listings/${listingId}`,
         { params: { token: this.token } }

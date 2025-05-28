@@ -19,6 +19,10 @@ const STANDARD_LIMITER = new bottleneck_1.default({
     maxConcurrent: 1,
     minTime: 10000 // 10 requests/minute
 });
+const UPDATE_LIMITER = new bottleneck_1.default({
+    maxConcurrent: 1,
+    minTime: 1000 // 60 requests/minute
+});
 const BATCH_LIMITER = new bottleneck_1.default({
     maxConcurrent: 1,
     minTime: 6000 // 10 requests/minute
@@ -43,7 +47,7 @@ class ClassifiedsClient {
     }
     updateListing(listingId, update) {
         return __awaiter(this, void 0, void 0, function* () {
-            return STANDARD_LIMITER.schedule(() => __awaiter(this, void 0, void 0, function* () {
+            return UPDATE_LIMITER.schedule(() => __awaiter(this, void 0, void 0, function* () {
                 const response = yield axios_1.default.patch(`https://backpack.tf/api/v2/classifieds/listings/${listingId}`, update, { params: { token: this.token } });
                 return response.data;
             }));
@@ -51,7 +55,7 @@ class ClassifiedsClient {
     }
     deleteListing(listingId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return STANDARD_LIMITER.schedule(() => __awaiter(this, void 0, void 0, function* () {
+            return UPDATE_LIMITER.schedule(() => __awaiter(this, void 0, void 0, function* () {
                 const response = yield axios_1.default.delete(`https://backpack.tf/api/v2/classifieds/listings/${listingId}`, { params: { token: this.token } });
                 return response.data;
             }));
