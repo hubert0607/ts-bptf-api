@@ -9,7 +9,7 @@ import {
 
 const STANDARD_LIMITER = new Bottleneck({
   maxConcurrent: 1,
-  minTime: 1200 // 50 requests/minute
+  minTime: 10000 // 10 requests/minute
 });
 
 const BATCH_LIMITER = new Bottleneck({
