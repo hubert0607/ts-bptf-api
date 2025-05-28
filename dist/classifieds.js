@@ -17,11 +17,11 @@ const axios_1 = __importDefault(require("axios"));
 const bottleneck_1 = __importDefault(require("bottleneck"));
 const STANDARD_LIMITER = new bottleneck_1.default({
     maxConcurrent: 1,
-    minTime: 1000 // 60 requests/minute
+    minTime: 1200 // 50 requests/minute
 });
 const BATCH_LIMITER = new bottleneck_1.default({
     maxConcurrent: 1,
-    minTime: 6000 // 10 requests/minute
+    minTime: 7000 // 8.5 requests/minute
 });
 class ClassifiedsClient {
     constructor() {

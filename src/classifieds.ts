@@ -9,12 +9,12 @@ import {
 
 const STANDARD_LIMITER = new Bottleneck({
   maxConcurrent: 1,
-  minTime: 1000 // 60 requests/minute
+  minTime: 1200 // 50 requests/minute
 });
 
 const BATCH_LIMITER = new Bottleneck({
   maxConcurrent: 1,
-  minTime: 6000 // 10 requests/minute
+  minTime: 7000 // 8.5 requests/minute
 });
 
 export class ClassifiedsClient {
