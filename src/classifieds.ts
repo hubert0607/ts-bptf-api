@@ -17,6 +17,9 @@ const BATCH_LIMITER = new Bottleneck({
   minTime: 7000 // 8.5 requests/minute
 });
 
+
+
+
 export class ClassifiedsClient {
   private readonly token: string;
 
@@ -56,6 +59,25 @@ export class ClassifiedsClient {
       );
       return response.data;
     });
+  }
+
+  
+  async publishAll() {
+    const response = await axios.post(
+        `https://backpack.tf/api/v2/classifieds/listings/publishAll`,
+        null,
+        { params: { token: this.token } }
+      );
+      return response.data;
+  }
+
+  async archiveAll() {
+    const response = await axios.post(
+        `https://backpack.tf/api/v2/classifieds/listings/archiveAll`,
+        null,
+        { params: { token: this.token } }
+      );
+      return response.data;
   }
 }
 
@@ -156,3 +178,15 @@ export class BatchClient {
     }
   }
 }
+
+
+// Check if this file is being run directly
+if (require.main === module) {
+    const classifiedsClient = new ClassifiedsClient();
+    // classifiedsClient.publishAll()
+    classifiedsClient.archiveAll()
+
+}
+
+
+
