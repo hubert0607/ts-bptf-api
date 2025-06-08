@@ -146,6 +146,10 @@ class BatchClientV2 {
     }
 }
 exports.BatchClientV2 = BatchClientV2;
+if (require.main === module) {
+    const classifiedsClient = new ClassifiedsClient();
+    classifiedsClient.archiveAll();
+}
 // if (require.main === module) {
 //   const batchClient = new BatchClientV2();
 //   let itemNew: ItemV2 = {

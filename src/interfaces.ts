@@ -1,5 +1,3 @@
-// For Snapshot method
-
 export interface Attribute {
     defindex: number;
     value?: string | number | null;
@@ -16,6 +14,7 @@ export interface Item {
   marketplace_price?: number;
   marketplace_sku?: string;
 }
+
   
 export interface SnapshotCurrencies {
   usd?: number;
@@ -47,7 +46,7 @@ export interface SnapshotResponse {
 
 
 
-// For Update Listing method  
+  
 export interface ListingCurrencies {
   metal?: number;
   keys?: number;
@@ -61,8 +60,6 @@ export interface listingPatchRequest {
 
 
 
-
-// For Batch methods
 export interface EntityV2 {
   id: number;
   name?: string;
@@ -84,11 +81,22 @@ export interface ItemV2 {
   killstreakTier?: number
   sheen?: EntityV2
   killstreaker?: EntityV2
+
+
+  recipe?: recipe
   
   festivized?: boolean
   australium?: boolean
 
   spells?: Spell[]
+}
+
+export interface recipe {
+  targetItem: targetItem
+}
+
+export interface targetItem{
+  itemName: string
 }
 
 export interface Spell {
@@ -100,10 +108,15 @@ export interface Spell {
 
 
 export interface ListingResolvable {
-  id?: number; 
-  item?: ItemV2;
+  id?: number; // For sell listings (item ID from inventory)
+  item?: ItemV2; // For buy listings
   offers: number,
   buyout: number,
   details?: string;
   currencies: ListingCurrencies;
 }
+
+// export interface ListingBatchCreateResult {
+//   result?: any; // This would be the actual listing object
+//   error?: any; // This would be the error object
+// }

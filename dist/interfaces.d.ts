@@ -63,9 +63,16 @@ export interface ItemV2 {
     killstreakTier?: number;
     sheen?: EntityV2;
     killstreaker?: EntityV2;
+    recipe?: recipe;
     festivized?: boolean;
     australium?: boolean;
     spells?: Spell[];
+}
+export interface recipe {
+    targetItem: targetItem;
+}
+export interface targetItem {
+    itemName: string;
 }
 export interface Spell {
     id?: string;
