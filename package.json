@@ -14,6 +14,11 @@
       "import": "./dist/interfaces.js",
       "require": "./dist/interfaces.js",
       "types": "./dist/interfaces.d.ts"
+    },
+    "./heartbeat": {
+      "import": "./dist/heartbeat.js",
+      "require": "./dist/heartbeat.js",
+      "types": "./dist/heartbeat.d.ts"
     }
   },
   "files": [
