@@ -1,0 +1,1 @@
+{"version":3,"file":"heartbeat.d.ts","sourceRoot":"","sources":["../src/heartbeat.ts"],"names":[],"mappings":"AAMA,qBAAa,SAAS;IACpB,OAAO,CAAC,KAAK,CAAS;;IAShB,SAAS,IAAI,OAAO,CAAC,MAAM,CAAC;IAU5B,iBAAiB,CAAC,aAAa,EAAE,MAAM,GAAG,OAAO,CAAC,MAAM,CAAC;IAczD,IAAI,IAAI,OAAO,CAAC,MAAM,CAAC;CAS9B"}
