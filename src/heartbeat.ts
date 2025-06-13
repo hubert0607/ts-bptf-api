@@ -48,7 +48,3 @@ export class Heartbeat {
     return response.data.status;
   }
 }
-
-let test = new Heartbeat()
-
-test.getStatus()

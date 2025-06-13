@@ -56,5 +56,3 @@ class Heartbeat {
     }
 }
 exports.Heartbeat = Heartbeat;
-let test = new Heartbeat();
-test.getStatus();
