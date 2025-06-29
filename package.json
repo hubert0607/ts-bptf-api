@@ -10,16 +10,47 @@
       "require": "./dist/classifieds.js",
       "types": "./dist/classifieds.d.ts"
     },
-    "./interfaces": {
-      "import": "./dist/interfaces.js",
-      "require": "./dist/interfaces.js",
-      "types": "./dist/interfaces.d.ts"
-    },
     "./heartbeat": {
       "import": "./dist/heartbeat.js",
       "require": "./dist/heartbeat.js",
       "types": "./dist/heartbeat.d.ts"
+    },
+    "./batch": {
+      "import": "./dist/batch.js",
+      "require": "./dist/batch.js",
+      "types": "./dist/batch.d.ts"
+    },
+    "./websocket": {
+      "import": "./dist/websocket.js",
+      "require": "./dist/websocket.js",
+      "types": "./dist/websocket.d.ts"
+    },
+    "./snapshots": {
+      "import": "./dist/snapshots.js",
+      "require": "./dist/snapshots.js",
+      "types": "./dist/snapshots.d.ts"
+    },
+    "./interfaces/snapshots": {
+      "import": "./dist/interfaces/snapshots.js",
+      "require": "./dist/interfaces/snapshots.js",
+      "types": "./dist/interfaces/snapshots.d.ts"
+    },
+    "./interfaces/classifieds": {
+      "import": "./dist/interfaces/classifieds.js",
+      "require": "./dist/interfaces/classifieds.js",
+      "types": "./dist/interfaces/classifieds.d.ts"
+    },
+    "./interfaces/batch": {
+      "import": "./dist/interfaces/batch.js",
+      "require": "./dist/interfaces/batch.js",
+      "types": "./dist/interfaces/batch.d.ts"
+    },
+    "./interfaces/websocket": {
+      "import": "./dist/interfaces/websocket.js",
+      "require": "./dist/interfaces/websocket.js",
+      "types": "./dist/interfaces/websocket.d.ts"
     }
+
   },
   "files": [
     "dist",
@@ -36,11 +67,14 @@
   "type": "commonjs",
   "devDependencies": {
     "@types/node": "^22.15.3",
+    "@types/ws": "^8.18.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "dependencies": {
     "axios": "^1.9.0",
-    "bottleneck": "^2.19.5"
+    "bottleneck": "^2.19.5",
+    "reconnecting-websocket": "^4.4.0",
+    "ws": "^8.18.3"
   }
 }
