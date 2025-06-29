@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = initializeWebsocket;
+exports.initializeWebsocket = initializeWebsocket;
 const reconnecting_websocket_1 = __importDefault(require("reconnecting-websocket"));
 const ws_1 = __importDefault(require("ws"));
 const WS_URL = 'wss://ws.backpack.tf/events';
@@ -32,11 +32,9 @@ function initializeWebsocket(wsEventsHandler) {
             try {
                 let events = JSON.parse(event.data.toString());
                 events = events.filter(e => e.payload.appid === 440);
-                events = events.filter(e => e.payload.steamid === process.env.MY_STEAM_ID);
                 if (events.length === 0) {
                     return;
                 }
-                console.log(JSON.stringify(events[0], null, 2));
                 wsEventsHandler(events);
             }
             catch (err) {

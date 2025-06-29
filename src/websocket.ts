@@ -5,7 +5,7 @@ import { EventMessage } from './interfaces/websocket';
 
 const WS_URL = 'wss://ws.backpack.tf/events';
 
-export default async function initializeWebsocket(wsEventsHandler: (events: EventMessage[]) => void) {
+export async function initializeWebsocket(wsEventsHandler: (events: EventMessage[]) => void) {
 
 
   const ws = new (ReconnectingWebSocket as any)(WS_URL, [], {
