@@ -16,7 +16,7 @@ exports.initializeWebsocket = initializeWebsocket;
 const reconnecting_websocket_1 = __importDefault(require("reconnecting-websocket"));
 const ws_1 = __importDefault(require("ws"));
 const WS_URL = 'wss://ws.backpack.tf/events';
-function initializeWebsocket(wsEventsHandler) {
+function initializeWebsocket(processEvents) {
     return __awaiter(this, void 0, void 0, function* () {
         const ws = new reconnecting_websocket_1.default(WS_URL, [], {
             WebSocket: ws_1.default,
@@ -35,7 +35,7 @@ function initializeWebsocket(wsEventsHandler) {
                 if (events.length === 0) {
                     return;
                 }
-                wsEventsHandler(events);
+                processEvents(events);
             }
             catch (err) {
                 console.error('❌ Failed to parse or save event:', err);
